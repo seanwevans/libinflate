@@ -100,7 +100,7 @@ function deflate(data) {
     let huffmanTree = buildHuffmanTree(frequencies);
     let huffmanCodes = generateHuffmanCodes(huffmanTree);
     let encodedData = huffmanEncode(lz77Data, huffmanCodes);
-    return encodedData;
+    return { encodedData, huffmanTree };
 }
 
 function huffmanDecode(encodedData, huffmanTree) {
@@ -114,7 +114,13 @@ function huffmanDecode(encodedData, huffmanTree) {
         }
 
         if (node.symbol !== undefined) {
-            decoded.push(node.symbol);
+            let symbol = node.symbol;
+            if (/^\(\d+,\d+\)$/.test(symbol)) {
+                const [distance, length] = symbol.slice(1, -1).split(',').map(Number);
+                decoded.push({ distance, length });
+            } else {
+                decoded.push({ byte: symbol });
+            }
             node = huffmanTree;  // Reset to the root for the next symbol
         }
     }
