@@ -1,0 +1,8 @@
+{
+  "name": "libinflate",
+  "version": "1.0.0",
+  "main": "libinflate.js",
+  "scripts": {
+    "test": "node test.js"
+  }
+}
