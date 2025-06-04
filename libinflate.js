@@ -94,14 +94,6 @@ function huffmanEncode(data, codeMap) {
     return encoded;
 }
 
-function parseSymbol(symbol) {
-    if (typeof symbol === "string" && symbol.startsWith("(") && symbol.endsWith(")")) {
-        let [distance, length] = symbol.slice(1, -1).split(',').map(Number);
-        return { distance, length };
-    }
-    return { byte: Number(symbol) };
-}
-
 function deflate(data) {
     let lz77Data = lz77_compress(data);
     let frequencies = buildFrequencyTable(lz77Data);
@@ -145,7 +137,18 @@ function lz77_decompress(data) {
 }
 
 function inflate(encodedData, huffmanTree) {
-    let lz77Data = huffmanDecode(encodedData, huffmanTree);
+    let symbols = huffmanDecode(encodedData, huffmanTree);
+    let lz77Data = symbols.map(sym => {
+        if (/^\(\d+,\d+\)$/.test(sym)) {
+            let [distance, length] = sym.slice(1, -1).split(',').map(Number);
+            return { distance, length };
+        }
+        let num = Number(sym);
+        if (!isNaN(num) && String(num) === sym) {
+            return { byte: num };
+        }
+        return { byte: sym };
+    });
     let originalData = lz77_decompress(lz77Data);
     return originalData;
 }
