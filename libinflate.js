@@ -100,7 +100,7 @@ function deflate(data) {
     let huffmanTree = buildHuffmanTree(frequencies);
     let huffmanCodes = generateHuffmanCodes(huffmanTree);
     let encodedData = huffmanEncode(lz77Data, huffmanCodes);
-    return encodedData;
+    return { encodedData, huffmanTree };
 }
 
 function huffmanDecode(encodedData, huffmanTree) {
@@ -137,7 +137,18 @@ function lz77_decompress(data) {
 }
 
 function inflate(encodedData, huffmanTree) {
-    let lz77Data = huffmanDecode(encodedData, huffmanTree);
+    let symbols = huffmanDecode(encodedData, huffmanTree);
+    let lz77Data = symbols.map(sym => {
+        if (/^\(\d+,\d+\)$/.test(sym)) {
+            let [distance, length] = sym.slice(1, -1).split(',').map(Number);
+            return { distance, length };
+        }
+        let num = Number(sym);
+        if (!isNaN(num) && String(num) === sym) {
+            return { byte: num };
+        }
+        return { byte: sym };
+    });
     let originalData = lz77_decompress(lz77Data);
     return originalData;
 }
