@@ -114,7 +114,7 @@ function huffmanDecode(encodedData, huffmanTree) {
         }
 
         if (node.symbol !== undefined) {
-            decoded.push(node.symbol);
+            decoded.push(parseSymbol(node.symbol));
             node = huffmanTree;  // Reset to the root for the next symbol
         }
     }
