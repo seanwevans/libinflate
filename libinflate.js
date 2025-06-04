@@ -100,7 +100,7 @@ function deflate(data) {
     let huffmanTree = buildHuffmanTree(frequencies);
     let huffmanCodes = generateHuffmanCodes(huffmanTree);
     let encodedData = huffmanEncode(lz77Data, huffmanCodes);
-    return encodedData;
+    return { encodedData, huffmanTree };
 }
 
 function huffmanDecode(encodedData, huffmanTree) {
